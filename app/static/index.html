@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>News Filter — агрегатор RSS с фильтрами</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">News Filter</div>
+  <div class="user-box">
+    <label for="user-select">Пользователь</label>
+    <select id="user-select"></select>
+    <button id="new-user-btn" class="secondary">+ Новый</button>
+    <button id="delete-user-btn" class="ghost" title="Удалить пользователя">Удалить</button>
+  </div>
+  <div class="status">
+    <span id="status-model" class="pill">модель…</span>
+    <span id="status-live" class="pill">offline</span>
+    <button id="refresh-btn" class="secondary" title="Опросить все каналы сейчас">Опросить каналы</button>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <nav class="tabs">
+      <button data-tab="filters" class="active">Фильтры</button>
+      <button data-tab="feeds">Каналы</button>
+      <button data-tab="test">Тестовый канал</button>
+    </nav>
+
+    <section id="tab-filters" class="tab active">
+      <form id="filter-form" class="card">
+        <div class="seg">
+          <label><input type="radio" name="kind" value="keyword" checked> Ключевые слова</label>
+          <label><input type="radio" name="kind" value="semantic"> Тема (семантика)</label>
+        </div>
+        <input name="name" placeholder="Название фильтра, напр. «ИИ»" required maxlength="100">
+        <textarea name="query" rows="2" required placeholder="нейросеть, ИИ, &quot;машинное обучение&quot;, -реклама"></textarea>
+        <div class="threshold-row hidden">
+          <label>Порог z ≥ <input name="threshold" type="number" step="0.1" min="0" max="10"></label>
+        </div>
+        <details class="help kw-help">
+          <summary>Синтаксис ключевых слов</summary>
+          <ul>
+            <li><code>нейросеть, ИИ</code>: любой терм (ИЛИ), сравнение по основе слова: «нейросети», «нейросетью» тоже совпадут</li>
+            <li><code>машинное обучение</code>: фраза, слова подряд</li>
+            <li><code>нейро*</code>: по префиксу</li>
+            <li><code>=Apple</code>: точная словоформа (аббревиатуры <code>NASA</code>, <code>ЦБ</code> ищутся точно)</li>
+            <li><code>+Россия</code>: обязательно должно встретиться</li>
+            <li><code>-реклама</code>: исключить новость</li>
+          </ul>
+        </details>
+        <details class="help sem-help hidden">
+          <summary>Как работает тема</summary>
+          <p>Тема и новости переводятся в векторы моделью <b>bge-m3</b>. Для каждой новости считается,
+          насколько тема ближе к ней, чем 40 нейтральных рубрик (z-оценка).
+          Можно указать несколько формулировок через запятую: берётся лучшая.
+          Порог ниже → больше новостей, выше → строже.</p>
+          <p>Пример: <code>космос, астрономия, исследование планет</code></p>
+        </details>
+        <button type="submit">Добавить фильтр</button>
+      </form>
+      <div id="filter-list"></div>
+    </section>
+
+    <section id="tab-feeds" class="tab">
+      <form id="feed-form" class="card">
+        <input name="url" type="url" required placeholder="https://example.com/rss.xml">
+        <button type="submit">Добавить канал</button>
+        <div id="feed-form-msg" class="msg"></div>
+      </form>
+      <p class="hint">Галочка: канал читается этим пользователем. Каталог каналов общий.</p>
+      <div id="feed-list"></div>
+    </section>
+
+    <section id="tab-test" class="tab">
+      <form id="post-form" class="card">
+        <input name="title" required maxlength="300" placeholder="Заголовок новости">
+        <textarea name="body" rows="4" maxlength="5000" placeholder="Текст новости"></textarea>
+        <input name="author" maxlength="100" placeholder="Автор (необязательно)">
+        <button type="submit">Опубликовать в тестовый канал</button>
+        <div id="post-form-msg" class="msg"></div>
+      </form>
+      <p class="hint">Канал доступен по адресу <a href="/rss/test.xml" target="_blank">/rss/test.xml</a>
+        и собирается приложением по HTTP, как любой внешний RSS.</p>
+      <div id="post-list"></div>
+    </section>
+  </aside>
+
+  <section class="feed">
+    <div class="feed-head">
+      <div class="seg">
+        <label><input type="radio" name="view" value="matched" checked> Отфильтрованная лента</label>
+        <label><input type="radio" name="view" value="all"> Все новости (с причинами)</label>
+      </div>
+      <div id="feed-stats" class="hint"></div>
+    </div>
+    <div id="feed-list-items"></div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

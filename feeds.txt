@@ -1,0 +1,8 @@
+# Каналы по умолчанию: по одному URL на строку, строки с # игнорируются
+# Новые URL из этого файла при перезапуске добавляются в каталог и подписываются всем существующим пользователям
+https://lenta.ru/rss/news
+https://www.vedomosti.ru/rss/news
+https://habr.com/ru/rss/articles/?fl=ru
+https://feeds.bbci.co.uk/news/technology/rss.xml
+https://www.nasa.gov/news-release/feed/
+https://ria.ru/export/rss2/archive/index.xml
